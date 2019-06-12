@@ -34,41 +34,6 @@ int nextTemp() {
   static int tempIdx = 0;
   return tempIdx++;
 }
-void genOp1(int i, char c) {
-  printf("# t%d=%c\n", i, c);
-  // t1=3 轉成 @3; D=A; @t1; M=D
-  printf("@%c\n", c);
-//   if(isdigit(c))printf("D=A\n");
-//   else if(isalpha(c) )printf("D=M\n");
-  char am = (isdigit(c)) ? 'A' :'M';
-  printf("D=%c\n",am);
-  printf("@t%d\n", i);
-  printf("M=D\n");
-}
-
-void genOp2(int i, int i1, char op, int i2) {
-  printf("# t%d=t%d%ct%d\n", i, i1, op, i2);
-  // t0=t1+t2 轉成 @t1; D=M; @t2; D=D+M; @t0; M=D;
-  printf("@t%d\n", i1);
-  printf("D=M\n");
-  printf("@t%d\n", i2);
-  printf("D=D%cM\n", op);
-  printf("@t%d\n", i);
-  printf("M=D\n");
-}
-// E = F ([+-] F)*
-int E() {
-  int i1 = F();
-  while (isNext("+-")) {
-    char op=next();
-    int i2 = F();
-    int i = nextTemp();
-    printf("t%d=t%d%ct%d\n", i, i1, op, i2);
-    i1 = i;
-  }
-  return i1;
-}
-
 
 // F =  Number | '(' E ')'
 int F() {
@@ -89,12 +54,26 @@ int F() {
   return f; 
 }
 
+// E = F ([+-] F)*
+int E() {
+  int i1 = F();
+  while (isNext("+-")) {
+    char op=next();
+    int i2 = F();
+    int i = nextTemp();
+    printf("t%d=t%d%ct%d\n", i, i1, op, i2);
+    i1 = i;
+  }
+  return i1;
+}
+
 void parse(char *str) {
   tokens = str;
   E();
 }
 
 int main(int argc, char * argv[]) {
+  printf("argv[0]=%s argv[1]=%s\n", argv[0], argv[1])
   printf("=== EBNF Grammar =====\n");
   printf("E=F ([+-] F)*\n");
   printf("F=Number | '(' E ')'\n");

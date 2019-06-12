@@ -68,7 +68,27 @@ void ASSIGN() {
   skip(";");
   emit("%s = t%d\n", id, e);
 }
+// IF =if (E) STMT (else STMT)?
+void IF()
+{
+  int elseLabel = nextLabel();
+  int endifLabel = nextLabel();
+  skip("if");
+  skip("(");
+  int e = E();
+  skip(")");
+  emit("ifont t%d goto L%d\n", e, elseLabel);
+  STMT();
+  emit("if t%d goto L%d\n", e, endifLabel);
+  if (isNext("else"))
+  {
+    emit("(L%d)\n", elseLabel);
+    skip("else");
+    STMT();
 
+  }
+  emit("(L%d)\n", elseLabel);
+}
 // while (E) STMT
 void WHILE() {
   int whileBegin = nextLabel();
